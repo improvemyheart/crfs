@@ -1,0 +1,77 @@
+#include <iostream>
+
+using namespace std;
+
+#include<bits/stdc++.h>
+using namespace std;
+#define N 1000005
+long long ans;
+struct pa {
+    int x,y;
+}a[N],b[N],q[N]; 
+int n,m;
+inline bool cmp(pa x,pa y) { 
+    if (x.x!=y.x) return x.x>y.x;
+    return x.y>y.y;
+}
+inline bool cmp1(pa x,pa y) { 
+    if (x.x!=y.x) return x.x<y.x;
+    return x.y<y.y;
+}
+inline void work(int l,int r,int L,int R) { 
+    if (L>R) return ;
+    if (l>r) return ;
+    int mid=(l+r)>>1;
+    long long gt=-1,gtw=R;
+    int ll=L,rr=R,s=R+1;
+    while (ll<=rr) {  
+        int M=(ll+rr)>>1;
+        if (b[M].x<a[mid].x) ll=M+1;
+        else rr=M-1,s=M;
+    }
+    for (int i=s;i<=R;i++) {  
+        long long t;
+        if (b[i].y<a[mid].y) break;
+        t=1ll*(b[i].y-a[mid].y)*(b[i].x-a[mid].x);
+        if (t>gt) gt=t,gtw=i;
+    }
+    ans=max(ans,gt);
+    if (gt!=-1) {  
+        work(l,mid-1,L,gtw); 
+        work(mid+1,r,gtw,R);
+    }
+    else {
+        work(mid+1,r,L,R);
+        work(l,mid-1,L,R);
+    }
+}
+int main() {
+    //freopen("d.in","r",stdin);
+    scanf("%d%d",&n,&m);
+    for (int i=1;i<=n;i++) scanf("%d%d",&a[i].x,&a[i].y);
+    for (int i=1;i<=m;i++) scanf("%d%d",&b[i].x,&b[i].y);
+    sort(a+1,a+1+n,cmp);
+    int r=0;
+    for (int i=1;i<=n;i++) {
+        while (r) {
+            if (a[i].y<=q[r].y) r--;
+            else break;
+        }
+        q[++r]=a[i];
+    }
+    n=r;
+    for (int i=r;i;i--) a[n-i+1]=q[i];
+    sort(b+1,b+1+m,cmp1);
+    r=0;
+    for (int i=1;i<=m;i++) { 
+        while (r) {
+        if (b[i].y>=q[r].y) r--;
+        else break;
+    }
+    q[++r]=b[i];
+    }
+    m=r;
+    for (int i=1;i<=r;i++) b[i]=q[i];
+    work(1,n,1,m); 
+    printf("%lld\n",ans); 
+}
